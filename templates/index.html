@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+
+
+<meta http-equiv="Cashe-Control" content="no no-store" />
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Products</title>
+        <meta http-equiv="PRAGMA" content="NO-CACHE">
+        <link rel="icon" href="data:;base64,=">
+        
+    </head>
+    <body>
+        
+        <h2>Список товаров</h2>
+        <p><a href="/create">Добавить</a></p>
+              
+        <table  border="1"  >
+            <thead><th>ИД</th><th>Partnum</th><th>считаем</th><th>количество</th><th>Цена</th><th>Поставщик</th><th>Название</th><th>Примечание</th><th>Дата</th><th></th></thead>
+            {{range . }}
+            <tr bgcolor={{.Color}}>
+                <!--<td>{{.Id}}</td>
+                
+                <td>{{.Partnum}}</td>
+                <td><form method="POST" action="/add/{{.Id}}">
+                    <button type="submit">on/off</button>
+                  </form>
+                </td>
+                <td><a href="/add/{{.Id}}">Добавить</a>>-->
+                <td>{{.Number}}</td>
+                <td>{{.Name}}</td>
+                <td>{{.PresencePrice}}</td>
+                <td>{{.SalesPrice}}</td>
+                <td>{{.NewPresencePrice}}</td>
+                <td>{{.NewSalesPrice}}</td>
+                <td><a href="/edit/{{.Id}}">Изменить</a> |
+                    <a href="/delete/{{.Id}}">Удалить</a>
+                </td>
+            </tr>
+            {{end}}
+        </table>
+        <form method="POST" action="/Checkout">
+            <button type="submit">Checkout</button>
+          </form>
+        
+    </body>
+</html>
