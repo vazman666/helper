@@ -10,8 +10,9 @@ import (
 var Price []models.Price_st
 
 func main() {
+	models.InitProvider("tiss")
 	//price := make(map[int]models.Price_st)
-	pkg.Loads2()
+	//pkg.Loads2()
 	pkg.Loads()
 
 	fmt.Printf("price: %v\n", models.Price)
