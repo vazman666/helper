@@ -10,16 +10,13 @@ import (
 var Price []models.Price_st
 
 func main() {
-	models.InitProvider("tiss")
-	//price := make(map[int]models.Price_st)
-	//pkg.Loads2()
-	pkg.Loads()
+	models.Price = make([]models.Price_st, 1)
+	models.Xlsx = make([]models.Price_st, 1)
 
-	fmt.Printf("price: %v\n", models.Price)
-	/*s1 := mux.NewRouter()
-	s1.HandleFunc("/", pkg.IndexHandler)
-	http.Handle("/", s1)
+	pkg.Readtiss()
+	pkg.Addsql()
+	pkg.CreateXLSX()
 
-	fmt.Println("Server is listening...8181")
-	http.ListenAndServe(":8181", nil)*/
+	fmt.Printf("Xls: %v\n", models.Xlsx)
+
 }

@@ -16,7 +16,10 @@ func CreateXLSX() {
 		SalesPrice:       "Продажная из SQL",
 		NewPresencePrice: "Новаая закупка",
 		Sales165:         "*1,65",
-		Sales205:         "*2,05"}
+		Sales205:         "*2,05",
+		WareHouse:        "Ячейка",
+		Oid:              "Oid",
+	}
 
 	wb := xlsx.NewFile() //создаём новый экскиз экселя
 
@@ -24,15 +27,21 @@ func CreateXLSX() {
 	if err != nil {
 		panic(err)
 	}
-	sheetTest.SetColWidth(0, 5, 12.5)
+	sheetTest.SetColWidth(1, 1, 8)
+	sheetTest.SetColWidth(2, 3, 16)
+	sheetTest.SetColWidth(4, 4, 55)
+	sheetTest.SetColWidth(5, 9, 13)
+	sheetTest.SetColWidth(10, 10, 20)
+	sheetTest.SetColWidth(11, 11, 12)
+	sheetTest.SetColWidth(12, 12, 1)
 
 	row1 := sheetTest.AddRow()
 	_ = row1.WriteStruct(&handle, -1)
 	row1.SetHeight(15)
-	for i := 0; i < 6; i++ {
+	/*for i := 0; i < 6; i++ {
 		_ = sheetTest.SetColAutoWidth(i, xlsx.DefaultAutoWidth)
-	}
-	for _, value := range models.Price {
+	}*/
+	for _, value := range models.Xlsx {
 
 		row1 = sheetTest.AddRow()        //добавляем строку
 		_ = row1.WriteStruct(&value, -1) //и вставляе в эту строку строку из прайс

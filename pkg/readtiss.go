@@ -19,11 +19,9 @@ func Readtiss() {
 		fmt.Println("Sheet does not exist")
 		return
 	}
-	fmt.Printf("MaxRow=%v\n", sh.MaxRow)
 
 	for i := 1; i < sh.MaxRow; i++ {
-		//for i, val := range sh {
-		fmt.Printf("%v\n", i)
+
 		theCell, err := sh.Cell(i, 3)
 		if err != nil {
 			panic(err)
@@ -64,12 +62,12 @@ func Readtiss() {
 		if err != nil {
 			panic(err)
 		}
-		//fmt.Printf("строка %v, значение %v", i, theCellVal)
+
 		newpresencepriceInt, _ := strconv.ParseFloat(newpresenceprice, 2)
-		//sales205, _ := strconv.ParseFloat(newpresenceprice, 2)
+
 		sales165 := fmt.Sprintf("%5.2f", newpresencepriceInt*1.65)
 		sales205 := fmt.Sprintf("%5.2f", newpresencepriceInt*2.05)
-		//sales165Str := strconv.Itoa(sales165 * 1.65)		//sales205Str := strconv.Itoa(sales205 * 2.05)
+
 		tmp := models.Price_st{Number: number, Name: name, NewPresencePrice: newpresenceprice, Firm: firm, Remark: remark, Sales165: sales165, Sales205: sales205}
 		models.Price = append(models.Price, tmp)
 	}
