@@ -1,0 +1,8 @@
+#!/bin/bash
+cp ~/Yandex.Disk/temp/a.xlsx/a.xlsx ~/go/helper/
+./xlstosql
+rm origin.xlsx
+rm a.xlsx
+rm ~/Yandex.Disk/temp/a.xlsx/a.xlsx
+rm ~/Yandex.Disk/temp/origin.xlsx/origin.xlsx
+

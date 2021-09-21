@@ -2,4 +2,5 @@
 cp ~/Yandex.Disk/temp/origin.xlsx/origin.xlsx ~/go/helper/
 ./helper
 cp a.xlsx ~/Yandex.Disk/temp/a.xlsx/
+rm a.xlsx
 

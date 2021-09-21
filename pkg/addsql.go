@@ -7,6 +7,7 @@ import (
 	"helper/models"
 	"log"
 	"strconv"
+	"strings"
 
 	_ "github.com/denisenkom/go-mssqldb"
 
@@ -55,12 +56,18 @@ func Addsql() {
 			}
 			for rows2.Next() {
 
-				err := rows2.Scan(&Caption)
+				err := rows2.Scan(&Caption) //фирма из базы
 				if err != nil {
 					log.Fatal(err)
 
 				}
 
+			}
+			if value.Firm == "JD" {
+				value.Firm = "Just Drive"
+			}
+			if strings.ToUpper(Caption) != strings.ToUpper(value.Firm) { //Если фирма из накладной не соответствует фирме из базы,
+				continue
 			}
 			rows3, err := condb.Query("SELECT TOP (1000) [PresencePrice], [SalesPrice] FROM [basebasebase].[dbo].[PricePresence] WHERE [Ware]=?", Oid) //используем базу данных tim
 			if err != nil {

@@ -1,0 +1,24 @@
+syntax="proto3";
+option go_package = "github.com/example/path/gen;gen";
+
+package fromsql;
+
+//import "google/protobuf/timestamp.proto";
+
+
+service SqlRequest{
+    rpc StreamSql(Request) returns (stream Answer);
+}
+
+message Request{
+    string number=1;
+}
+
+message Answer{
+    string Oid =2;
+    string Firm = 3;
+    string PresencePrice = 4;
+    string SalesPrice = 5;
+    string Caption = 6;
+}
+//protoc --go_out=./timeservice/ --go-grpc_out=./timeservice/ ./timeservice/timeservice.proto
