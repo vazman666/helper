@@ -1,15 +1,17 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
+	"io"
 	"log"
 	"net"
 	pb "server/gen"
-	"strconv"
+	"server/pkg"
 
 	_ "github.com/denisenkom/go-mssqldb"
+	"github.com/golang/protobuf/ptypes/wrappers"
 
+	//"gitlab.skillbox.ru/timur_taitsenov/go_developer_pro/lesson4/sources/pkg/mod/github.com/golang/protobuf@v1.5.0/ptypes/wrappers"
 	"google.golang.org/grpc"
 )
 
@@ -21,77 +23,33 @@ type Server struct {
 
 func (s *Server) StreamSql(number *pb.Request, stream pb.SqlRequest_StreamSqlServer) error {
 	fmt.Printf("Number = %v\n", number.Number)
-	condb, errdb := sql.Open("mssql", "server=192.168.1.40;user id=admin;password=12345;")
-	if errdb != nil {
-		fmt.Println(" Error open db:", errdb.Error())
-	}
-	a := pb.Answer{
-		Oid:           "1232",
-		Firm:          "Mits",
-		PresencePrice: "20",
-		SalesPrice:    "323",
-		Caption:       "123",
-	}
-	rows, err := condb.Query("use basebasebase") //используем базу данных basebasebase
-	if err != nil {
-		log.Fatal(err)
-	}
-	//Заброс к бд с OriginalCode=number
-	rows, err = condb.Query("SELECT TOP (1000) [Oid],[Producer] FROM [basebasebase].[dbo].[Ware]  WHERE [OriginalCode]=? ", number.Number)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-	for rows.Next() {
-		err := rows.Scan(&a.Oid, &a.Firm)
-		if err != nil {
-			log.Fatal(err)
-
-		}
-		rows2, err := condb.Query("SELECT  [Caption] FROM [basebasebase].[dbo].[Producer]  WHERE [OID]=? ", a.Firm)
-		if err != nil {
-			log.Fatal(err)
-		}
-		for rows2.Next() {
-
-			err := rows2.Scan(&a.Caption) //фирма из базы
-			if err != nil {
-				log.Fatal(err)
-
-			}
-
-		}
-
-		rows3, err := condb.Query("SELECT TOP (1000) [PresencePrice], [SalesPrice] FROM [basebasebase].[dbo].[PricePresence] WHERE [Ware]=?", a.Oid) //используем базу данных tim
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		for rows3.Next() {
-
-			err := rows3.Scan(&a.PresencePrice, &a.SalesPrice)
-			if err != nil {
-				log.Fatal(err)
-			}
-
-		}
-		if a.Oid == "" {
-			a.PresencePrice = "---"
-			a.SalesPrice = "---"
-		} else {
-			pp, _ := strconv.ParseFloat(a.PresencePrice, 2)
-			sp, _ := strconv.ParseFloat(a.SalesPrice, 2)
-			a.PresencePrice = fmt.Sprintf("%5.2f", pp)
-			a.SalesPrice = fmt.Sprintf("%5.2f", sp)
-		}
-
-		err = stream.Send(&a)
+	a := pkg.QuerySQL(number.Number)
+	for _, val := range a {
+		tmp := pb.Answer{Oid: val.Oid,
+			FirmSql:       val.Firm,
+			PresencePrice: val.PresencePrice,
+			SalesPrice:    val.SalesPrice,
+			Caption:       val.Caption}
+		err := stream.Send(&tmp)
 		if err != nil {
 			return fmt.Errorf("error sending message to stream : %v", err)
 		}
+	}
+	return nil
+
+}
+func (s *Server) Change(stream pb.SqlRequest_ChangeServer) error {
+	for {
+		order, err := stream.Recv()
+
+		if err == io.EOF {
+			return stream.SendAndClose(&wrappers.BoolValue{Value: true})
+		}
+		//fmt.Printf("order = %v\n\n", order)
+		pkg.Change(order.SalesPrice, order.Number, order.Oid, order.PresencePrice)
 
 	}
-
+	//fmt.Printf("stream = %v", stream)
 	return nil
 }
 
@@ -106,4 +64,5 @@ func main() {
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("Failed to serve: %v", err)
 	}
+
 }

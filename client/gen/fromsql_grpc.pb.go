@@ -7,6 +7,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -19,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type SqlRequestClient interface {
 	StreamSql(ctx context.Context, in *Request, opts ...grpc.CallOption) (SqlRequest_StreamSqlClient, error)
+	Change(ctx context.Context, opts ...grpc.CallOption) (SqlRequest_ChangeClient, error)
 }
 
 type sqlRequestClient struct {
@@ -61,11 +63,46 @@ func (x *sqlRequestStreamSqlClient) Recv() (*Answer, error) {
 	return m, nil
 }
 
+func (c *sqlRequestClient) Change(ctx context.Context, opts ...grpc.CallOption) (SqlRequest_ChangeClient, error) {
+	stream, err := c.cc.NewStream(ctx, &SqlRequest_ServiceDesc.Streams[1], "/fromsql.SqlRequest/Change", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &sqlRequestChangeClient{stream}
+	return x, nil
+}
+
+type SqlRequest_ChangeClient interface {
+	Send(*Answer) error
+	CloseAndRecv() (*wrapperspb.BoolValue, error)
+	grpc.ClientStream
+}
+
+type sqlRequestChangeClient struct {
+	grpc.ClientStream
+}
+
+func (x *sqlRequestChangeClient) Send(m *Answer) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *sqlRequestChangeClient) CloseAndRecv() (*wrapperspb.BoolValue, error) {
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	m := new(wrapperspb.BoolValue)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // SqlRequestServer is the server API for SqlRequest service.
 // All implementations must embed UnimplementedSqlRequestServer
 // for forward compatibility
 type SqlRequestServer interface {
 	StreamSql(*Request, SqlRequest_StreamSqlServer) error
+	Change(SqlRequest_ChangeServer) error
 	mustEmbedUnimplementedSqlRequestServer()
 }
 
@@ -75,6 +112,9 @@ type UnimplementedSqlRequestServer struct {
 
 func (UnimplementedSqlRequestServer) StreamSql(*Request, SqlRequest_StreamSqlServer) error {
 	return status.Errorf(codes.Unimplemented, "method StreamSql not implemented")
+}
+func (UnimplementedSqlRequestServer) Change(SqlRequest_ChangeServer) error {
+	return status.Errorf(codes.Unimplemented, "method Change not implemented")
 }
 func (UnimplementedSqlRequestServer) mustEmbedUnimplementedSqlRequestServer() {}
 
@@ -110,6 +150,32 @@ func (x *sqlRequestStreamSqlServer) Send(m *Answer) error {
 	return x.ServerStream.SendMsg(m)
 }
 
+func _SqlRequest_Change_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(SqlRequestServer).Change(&sqlRequestChangeServer{stream})
+}
+
+type SqlRequest_ChangeServer interface {
+	SendAndClose(*wrapperspb.BoolValue) error
+	Recv() (*Answer, error)
+	grpc.ServerStream
+}
+
+type sqlRequestChangeServer struct {
+	grpc.ServerStream
+}
+
+func (x *sqlRequestChangeServer) SendAndClose(m *wrapperspb.BoolValue) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *sqlRequestChangeServer) Recv() (*Answer, error) {
+	m := new(Answer)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // SqlRequest_ServiceDesc is the grpc.ServiceDesc for SqlRequest service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -122,6 +188,11 @@ var SqlRequest_ServiceDesc = grpc.ServiceDesc{
 			StreamName:    "StreamSql",
 			Handler:       _SqlRequest_StreamSql_Handler,
 			ServerStreams: true,
+		},
+		{
+			StreamName:    "Change",
+			Handler:       _SqlRequest_Change_Handler,
+			ClientStreams: true,
 		},
 	},
 	Metadata: "proto/fromsql.proto",

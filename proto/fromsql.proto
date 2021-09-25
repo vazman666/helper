@@ -4,10 +4,13 @@ option go_package = "github.com/example/path/gen;gen";
 package fromsql;
 
 //import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
 
 
 service SqlRequest{
     rpc StreamSql(Request) returns (stream Answer);
+    rpc Change(stream Answer) returns (google.protobuf.BoolValue);
+   
 }
 
 message Request{
@@ -15,10 +18,12 @@ message Request{
 }
 
 message Answer{
-    string Oid =2;
-    string Firm = 3;
-    string PresencePrice = 4;
-    string SalesPrice = 5;
-    string Caption = 6;
+    string Oid =1;
+    string FirmSql = 2;
+    string PresencePrice = 3;
+    string SalesPrice = 4;
+    string Caption = 5;
+    string Number = 6;
 }
+
 //protoc --go_out=./timeservice/ --go-grpc_out=./timeservice/ ./timeservice/timeservice.proto
