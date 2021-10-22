@@ -24,6 +24,7 @@ message Answer{
     string SalesPrice = 4;
     string Caption = 5;
     string Number = 6;
+    string Cell = 7;
 }
 
 //protoc --go_out=./timeservice/ --go-grpc_out=./timeservice/ ./timeservice/timeservice.proto
