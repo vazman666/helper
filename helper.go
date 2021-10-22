@@ -13,10 +13,12 @@ func main() {
 	models.Price = make([]models.Price_st, 1)
 	models.Xlsx = make([]models.Price_st, 1)
 
-	pkg.Readtiss()
+	/*pkg.Readtiss()
 	pkg.Addsql()
 	pkg.CreateXLSX()
 
-	fmt.Printf("Xls: %v\n", models.Xlsx)
+	fmt.Printf("Xls: %v\n", models.Xlsx)*/
+	a := pkg.SqlRequest("6PK1000")
+	fmt.Printf("a=%v\n", a)
 
 }
