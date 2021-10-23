@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"log"
@@ -21,21 +22,22 @@ type Server struct {
 	pb.UnimplementedSqlRequestServer
 }
 
-func (s *Server) StreamSql(number *pb.Request, stream pb.SqlRequest_StreamSqlServer) error {
-	fmt.Printf("Number = %v\n", number.Number)
-	a := pkg.QuerySQL(number.Number)
-	for _, val := range a {
-		tmp := pb.Answer{Oid: val.Oid,
-			FirmSql:       val.Firm,
-			PresencePrice: val.PresencePrice,
-			SalesPrice:    val.SalesPrice,
-			Caption:       val.Caption}
-		err := stream.Send(&tmp)
-		if err != nil {
-			return fmt.Errorf("error sending message to stream : %v", err)
-		}
-	}
-	return nil
+func (s *Server) StreamSql(ctx context.Context, in *pb.Request) (*pb.Answer, error) {
+	fmt.Printf("Запрос на %v   %v\n", in.Number, in.Firm)
+	a := pkg.QuerySQL(in.Number, in.Firm)
+
+	ans := pb.Answer{Oid: a.Oid,
+		FirmSql:       a.Firm,
+		PresencePrice: a.PresencePrice,
+		SalesPrice:    a.SalesPrice,
+		Caption:       a.Caption,
+		Cell:          a.Cell}
+	/*err := stream.Send(&tmp)
+	if err != nil {
+		return ans, fmt.Errorf("error sending message to stream : %v", err)
+	}*/
+
+	return &ans, nil
 
 }
 func (s *Server) Change(stream pb.SqlRequest_ChangeServer) error {

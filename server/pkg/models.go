@@ -6,5 +6,7 @@ type OurDataStruct struct {
 	PresencePrice string
 	SalesPrice    string
 	Caption       string
+	Cell          string
 }
-type OurData []OurDataStruct
+
+//type OurData []OurDataStruct

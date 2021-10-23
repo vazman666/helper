@@ -8,13 +8,14 @@ import "google/protobuf/wrappers.proto";
 
 
 service SqlRequest{
-    rpc StreamSql(Request) returns (stream Answer);
+    rpc StreamSql(Request) returns (Answer);
     rpc Change(stream Answer) returns (google.protobuf.BoolValue);
    
 }
 
 message Request{
     string number=1;
+    string firm=2;
 }
 
 message Answer{
@@ -27,4 +28,4 @@ message Answer{
     string Cell = 7;
 }
 
-//protoc --go_out=./timeservice/ --go-grpc_out=./timeservice/ ./timeservice/timeservice.proto
+//protoc --go_out=./proto/ --go-grpc_out=./proto/ ./proto/fromsql.proto
