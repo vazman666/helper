@@ -23,7 +23,7 @@ type Server struct {
 }
 
 func (s *Server) StreamSql(ctx context.Context, in *pb.Request) (*pb.Answer, error) {
-	fmt.Printf("Запрос на %v   %v\n", in.Number, in.Firm)
+	fmt.Printf("Запрос на номер %v   фирмы %v\n", in.Number, in.Firm)
 	a := pkg.QuerySQL(in.Number, in.Firm)
 
 	ans := pb.Answer{Oid: a.Oid,
@@ -31,7 +31,10 @@ func (s *Server) StreamSql(ctx context.Context, in *pb.Request) (*pb.Answer, err
 		PresencePrice: a.PresencePrice,
 		SalesPrice:    a.SalesPrice,
 		Caption:       a.Caption,
-		Cell:          a.Cell}
+		Cellm:         a.Cellm,
+		Cellt:         a.Cellt,
+		Name:          a.Name,
+	}
 	/*err := stream.Send(&tmp)
 	if err != nil {
 		return ans, fmt.Errorf("error sending message to stream : %v", err)

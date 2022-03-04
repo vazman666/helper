@@ -13,11 +13,12 @@ func Change(newprice, number, oid, newpresenceprice string) {
 	if errdb != nil {
 		log.Fatalf(" Error open db:%v\n", errdb.Error())
 	}
+	defer condb.Close()	
 	if newprice != "---" {
 		if number == "" || oid == "" {
 			return
 		}
-		fmt.Printf("Number=%v\n", number)
+		/*fmt.Printf("Number=%v\n", number)
 		Oid := ""
 		rows, err := condb.Query("SELECT  [Oid] FROM [basebasebase].[dbo].[Ware]  WHERE [OriginalCode]=? AND [OID]=?", number, oid)
 		//fmt.Println("--s--")
@@ -31,21 +32,22 @@ func Change(newprice, number, oid, newpresenceprice string) {
 				log.Fatal("Error: ", err)
 			}
 
-		}
-		fmt.Printf("Number %v закупка будет %v Продажа будет %v. OID=%v\n", number, newpresenceprice, newprice, Oid)
-		rows, err = condb.Query("UPDATE [basebasebase].[dbo].[PricePresence] SET [SalesPrice]=?  WHERE [Ware]=? AND [fPricelistPresence]=1", newprice, Oid)
+		}*/
+		fmt.Printf("Number %v закупка будет %v Продажа будет %v. OID=%v\n", number, newpresenceprice, newprice, oid)
+		_, err := condb.Query("UPDATE [basebasebase].[dbo].[PricePresence] SET [SalesPrice]=?  WHERE [Ware]=? AND [fPricelistPresence]=1", newprice, oid)
 		if err != nil {
 			log.Fatal(err)
 		}
-		rows, err = condb.Query("UPDATE [basebasebase].[dbo].[PricePresence] SET [SalesPrice]=?  WHERE [Ware]=? AND [fPricelistPresence]=2", newprice, Oid)
+		_, err = condb.Query("UPDATE [basebasebase].[dbo].[PricePresence] SET [SalesPrice]=?  WHERE [Ware]=? AND [fPricelistPresence]=2", newprice, oid)
 		if err != nil {
 			log.Fatal(err)
 		}
-		rows, err = condb.Query("UPDATE [basebasebase].[dbo].[PricePresence] SET [PresencePrice]=?  WHERE [Ware]=? AND [fPricelistPresence]=1", newpresenceprice, Oid)
+
+		_, err = condb.Query("UPDATE [basebasebase].[dbo].[PricePresence] SET [PresencePrice]=?  WHERE [Ware]=? AND [fPricelistPresence]=1", newpresenceprice, oid)
 		if err != nil {
 			log.Fatal(err)
 		}
-		rows, err = condb.Query("UPDATE [basebasebase].[dbo].[PricePresence] SET [PresencePrice]=?  WHERE [Ware]=? AND [fPricelistPresence]=2", newpresenceprice, Oid)
+		_, err = condb.Query("UPDATE [basebasebase].[dbo].[PricePresence] SET [PresencePrice]=?  WHERE [Ware]=? AND [fPricelistPresence]=2", newpresenceprice, oid)
 		if err != nil {
 			log.Fatal(err)
 		}

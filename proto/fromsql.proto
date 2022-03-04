@@ -25,7 +25,9 @@ message Answer{
     string SalesPrice = 4;
     string Caption = 5;
     string Number = 6;
-    string Cell = 7;
+    string Cellm = 7;
+    string Cellt = 8;
+    string Name = 9;
 }
 
 //protoc --go_out=./proto/ --go-grpc_out=./proto/ ./proto/fromsql.proto

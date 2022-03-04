@@ -11,7 +11,7 @@ import (
 
 func QuerySQL(number, firm string) OurDataStruct { //функкция возвращает по номеру и фирме соответствующую структуру
 	var tmp OurDataStruct
-	//var rezult OurData
+	firm = Firm(firm)
 	condb, errdb := sql.Open("mssql", "server=192.168.1.40;user id=admin;password=12345;")
 	if errdb != nil {
 		fmt.Println(" Error open db:", errdb.Error())
@@ -25,54 +25,101 @@ func QuerySQL(number, firm string) OurDataStruct { //функкция возвр
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = rows.Scan(&tmp.Firm)
+	defer rows.Close()
+	for rows.Next() {
+
+		if err := rows.Scan(&tmp.Firm); err != nil {
+			log.Fatal("Ошибка выбора OID фирмы %v\n",err)
+		}
+
+	}
+	rows, err = condb.Query("SELECT [Oid], [Caption]  FROM [basebasebase].[dbo].[Ware]  WHERE [Code]=? AND [Producer]=?", number, tmp.Firm) //выбираем Oid запчасти по фирме и номеру запчасти
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Ошибка выбора OID запчасти %v\n",err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+
+		if err := rows.Scan(&tmp.Oid, &tmp.Name); err != nil {
+			log.Fatal(err)
+		}
+
+	}
+	if tmp.Oid == "" {
+		fmt.Printf("Not fount in base num=%v firm=%v\n", number, firm)
+		tmp.PresencePrice = "----"
+		tmp.SalesPrice = "----"
+		return tmp
+
+	}
+	rows, err = condb.Query("SELECT  [DefaultWarehouse] FROM [basebasebase].[dbo].[WarehouseMinQuantity]  WHERE [ParentWare]=? AND [Warehouse] = 619", tmp.Oid) //ячейка Мытищи
+	if err != nil {
+		log.Fatal("Ошибка запроса при выборе ячейка Мытищи %v\n",err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+
+		if err := rows.Scan(&tmp.Cellm); err != nil {
+			log.Fatal("Ошибка при scan ячейка Мытищи %v\n",err)
+		}
 
 	}
 
-	rows, err = condb.Query("SELECT TOP (1000) [Oid] FROM [basebasebase].[dbo].[Ware]  WHERE [Code]=? AND [Producer]=?", number, tmp.Firm) //выбираем Oid запчасти по фирме и номеру запчасти
+	rows, err = condb.Query("SELECT  [Path] FROM [basebasebase].[dbo].[Warehouse]  WHERE [Oid]=? ", tmp.Cellm)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
 
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = rows.Scan(&tmp.Oid)
-	if err != nil {
-		log.Fatal(err)
+		if err := rows.Scan(&tmp.Cellm); err != nil {
+			log.Fatal("Ошибка при scan конекретно ячейки Мытищи %v\n",err)
+		}
 
 	}
-	rows, err = condb.Query("SELECT  [DefaultWarehouse] FROM [basebasebase].[dbo].[WarehouseMinQuantity]  WHERE [ParentWare]=? AND [Warehouse] = 619", tmp.Oid)
+	rows, err = condb.Query("SELECT  [DefaultWarehouse] FROM [basebasebase].[dbo].[WarehouseMinQuantity]  WHERE [ParentWare]=? AND [Warehouse] = 168", tmp.Oid) //ячейка Титан
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = rows.Scan(&tmp.Cell) //код ячейки
-	if err != nil {
-		log.Fatal(err)
-	}
-	rows, err = condb.Query("SELECT  [Path] FROM [basebasebase].[dbo].[Warehouse]  WHERE [Oid]=? ", tmp.Cell)
-	if err != nil {
-		log.Fatal(err)
-	}
-	err = rows.Scan(&tmp.Cell) //путь ячейки
-	if err != nil {
-		log.Fatal(err)
-	}
-	rows, err = condb.Query("SELECT TOP (1000) [PresencePrice], [SalesPrice] FROM [basebasebase].[dbo].[PricePresence] WHERE [Ware]=?", tmp.Oid)
-	if err != nil {
-		log.Fatal(err)
+	defer rows.Close()
+	for rows.Next() {
+
+		if err := rows.Scan(&tmp.Cellt); err != nil {
+			log.Fatal(err)
+		}
+
 	}
 
-	err = rows.Scan(&tmp.PresencePrice, &tmp.SalesPrice)
+	rows, err = condb.Query("SELECT  [Path] FROM [basebasebase].[dbo].[Warehouse]  WHERE [Oid]=? ", tmp.Cellt)
 	if err != nil {
 		log.Fatal(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+
+		if err := rows.Scan(&tmp.Cellt); err != nil {
+			log.Fatal("Ошибка скан конкретно ячейки Титан %v\n",err)
+		}
+
+	}
+
+	rows, err = condb.Query("SELECT  [PresencePrice], [SalesPrice] FROM [basebasebase].[dbo].[PricePresence] WHERE [Ware]=?", tmp.Oid)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+
+		if err := rows.Scan(&tmp.PresencePrice, &tmp.SalesPrice); err != nil {
+			log.Fatal("Ошибка scan прайсов %v\n",err)
+		}
+
 	}
 
 	pp, _ := strconv.ParseFloat(tmp.PresencePrice, 2)
 	sp, _ := strconv.ParseFloat(tmp.SalesPrice, 2)
 	tmp.PresencePrice = fmt.Sprintf("%5.2f", pp)
 	tmp.SalesPrice = fmt.Sprintf("%5.2f", sp)
-	//rezult = append(rezult, tmp)
 
 	return tmp
 }
