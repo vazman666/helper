@@ -7,6 +7,8 @@ func Firm(firm string) string {
 		tmp = "Just Drive"
 	case "Sangsin Brake":
 		tmp = "Sangsin"
+	case "HSB":
+		tmp = "Hong Sung Brake"
 	default:
 		tmp = firm
 	}

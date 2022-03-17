@@ -10,6 +10,7 @@ import "google/protobuf/wrappers.proto";
 service SqlRequest{
     rpc StreamSql(Request) returns (Answer);
     rpc Change(stream Answer) returns (google.protobuf.BoolValue);
+    rpc Analogs(Request) returns(stream Request);
    
 }
 

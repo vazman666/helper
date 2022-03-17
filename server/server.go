@@ -7,6 +7,7 @@ import (
 	"log"
 	"net"
 	pb "server/gen"
+
 	"server/pkg"
 
 	_ "github.com/denisenkom/go-mssqldb"
@@ -57,8 +58,23 @@ func (s *Server) Change(stream pb.SqlRequest_ChangeServer) error {
 	//fmt.Printf("stream = %v", stream)
 	return nil
 }
+func (s *Server) Analogs(in *pb.Request, stream pb.SqlRequest_AnalogsServer) error {
+	fmt.Printf("Запрос на номер %v   фирмы %v\n", in.Number, in.Firm)
+	pkg.Analogue(pkg.Analog{in.Firm, in.Number})
+	//fmt.Printf("нашли %v\n", pkg.Analogs)
+	for _, feature := range pkg.Analogs {
+		resp := pb.Request{Number: feature.Number, Firm: feature.Firm}
+		if err := stream.Send(&resp); err != nil {
+			return err
+
+		}
+	}
+
+	return nil
+}
 
 func main() {
+
 	lis, err := net.Listen("tcp", port)
 	if err != nil {
 		log.Fatal("Failed to listen : %v", err)

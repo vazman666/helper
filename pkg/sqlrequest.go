@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 	"helper/models"
+	pb "helper/pkg/gen"
 	"io"
 	"log"
-	pb "pkg/gen"
 
 	"google.golang.org/grpc"
 )

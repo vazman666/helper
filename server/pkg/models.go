@@ -10,5 +10,11 @@ type OurDataStruct struct {
 	Cellt         string
 	Name          string
 }
+type Analog struct {
+	Firm   string
+	Number string
+}
+
+var Analogs []Analog
 
 //type OurData []OurDataStruct

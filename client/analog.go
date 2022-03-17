@@ -12,7 +12,7 @@ import (
 )
 
 //const address = "vazman.ru:50051"
-const address = "localhost:50051"
+const address = "192.168.1.16:50051"
 
 func printFeatures(client pb.SqlRequestClient, rect *pb.Request) {
 	fmt.Printf("Looking for features within %v\n", rect)
